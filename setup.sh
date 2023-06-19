@@ -3,6 +3,7 @@
 TEMPLATEPATH=/sandbox/templates
 IMAGESPATH=/sandbox/images
 ISOPATH=/sandbox/iso
+CONFIGPATH=/sandbox/vmconf
 
 # Set up directories
 
@@ -23,6 +24,12 @@ then
 	echo "$ISOPATH exists. Skipping..."
 else
 	mkdir "$ISOPATH"
+fi
+if [[ -f  "$VMCONF" ]]
+then
+	echo "$VMCONF exists. Skipping..."
+else
+	touch "$VMCONF"
 fi
 
 # Copy system configuration files

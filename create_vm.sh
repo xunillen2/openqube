@@ -16,6 +16,7 @@ fi
 TEMPLATEPATH=/sandbox/templates
 IMAGESPATH=/sandbox/images
 ISOPATH=/sandbox/iso
+CONFIGPATH=/sandbox/vmconf
 VMNAME=${1}-vm
 TEMPLATENAME=${2}
 HOMESIZE=${3}
@@ -76,6 +77,8 @@ if [[ -f "$VMOSP" || -f "$VMHOMEP" ]]
 then
 	echo "VM images with same name already exist. Please change vm name."
 	exit 1
+#else
+	#grep -v "^\\"$VMNAME"," "$CONFIGPATH" > "$CONFIGPATH" # Clear config 
 fi
 
 # Check if given template exists
@@ -113,7 +116,7 @@ then
 	cleanup;
 fi
 echo "Creating VM persistent(private) image..."
-#vmctl create -i "$TEMPLATEHOMEP" -s "$HOMESIZE" "$VMHOMEP" > /dev/null 2>&1
+#vmctl -v create -i "$TEMPLATEHOMEP" -s "$HOMESIZE" "$VMHOMEP"
 #if ! [[ $? -eq 0 ]]
 #then
 #	echo "Error while creating persistent(private) image... Cleaning up."
@@ -136,6 +139,7 @@ vm "${VMNAME}" {
     disable
 }
 EOF
+echo "$VMNAME,$TEMPLATENAME" >> "$CONFIGPATH"	# Put template info
 
 # reload vmd
 vmctl reload
