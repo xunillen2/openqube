@@ -42,19 +42,6 @@ cleanup() {
 	exit 1;
 }
 
-echo $VMNAME
-echo $TEMPLATENAME
-echo $HOMESIZE
-echo $OWNERNAME
-echo $TEMPLATEOS
-echo $TEMPLATEHOME
-echo $TEMPLATEOSP
-echo $TEMPLATEHOMEP
-echo $VMOS
-echo $VMHOME
-echo $VMOSP
-echo $VMHOMEP
-
 # Check if required directories exist
 if ! [[ -d  "$TEMPLATEPATH" ]]
 then
@@ -148,6 +135,4 @@ then
 	echo "Reloading failed."
 	exit 1
 fi
-exit 0
-
 exit 0
