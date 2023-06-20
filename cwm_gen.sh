@@ -1,15 +1,14 @@
 #!/bin/sh
 
-if [ "$#" != 4 ]
+if [ "$#" != 3 ]
 then
-	echo "Usage: ./cwm_gen.sh vm_name vm_ip entry command"
+	echo "Usage: ./cwm_gen.sh vm_name entry command"
 	exit 1
 fi
 
 VMNAME=${1}-vm
-IP=${2}
-ENTRY=${3}
-COMMAND=${4}
+ENTRY=${2}
+COMMAND=${3}
 CONFIGPATH=/sandbox/vmconf
 IMAGESPATH=/sandbox/images
 CWMRC=~/.cwmrc
@@ -26,6 +25,7 @@ then
 	exit 1
 fi
 
+IP=$(cat $CONFIGPATH | grep "^\\"$VMNAME"," | cut -d',' -f3;)
 TEMP="command $ENTRY-${1}	\"ssh user@$IP -Y $COMMAND\""
 echo $TEMP
 grep "$TEMP" $CWMRC

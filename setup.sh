@@ -25,11 +25,11 @@ then
 else
 	mkdir "$ISOPATH"
 fi
-if [[ -f  "$VMCONF" ]]
+if [[ -f  "$CONFIGPATH" ]]
 then
-	echo "$VMCONF exists. Skipping..."
+	echo "$CONFIGPATH exists. Skipping..."
 else
-	touch "$VMCONF"
+	touch "$CONFIGPATH"
 fi
 
 # Copy system configuration files

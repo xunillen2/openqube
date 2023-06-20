@@ -17,6 +17,9 @@ TEMPLATEPATH=/sandbox/templates
 IMAGESPATH=/sandbox/images
 ISOPATH=/sandbox/iso
 CONFIGPATH=/sandbox/vmconf
+IFCFOLD=/tmp/if-old
+IFCFNEW=/tmp/if-new
+VMCFOLD=/tmp/vm.conf.temp
 VMNAME=${1}-vm
 TEMPLATENAME=${2}
 HOMESIZE=${3}
@@ -91,7 +94,6 @@ then
     exit 1
 fi
 
-
 # Create vm images from templates
 # vmctl returns 0 on success and >0 on error.
 # Check if vmd is enabled.
@@ -114,6 +116,8 @@ cp "$TEMPLATEHOMEP" "$VMHOMEP"
 # generate a MAC address
 MAC="$(hexdump -n3 -e'/3 "00:60:2F" 3/1 ":%02X"' /dev/random)"
 
+# Backup old config
+cat /etc/vm.conf > $VMCFOLD 
 # Create vm config
 echo "Creating config..."
 cat <<EOF >>/etc/vm.conf
@@ -126,13 +130,33 @@ vm "${VMNAME}" {
     disable
 }
 EOF
-echo "$VMNAME,$TEMPLATENAME" >> "$CONFIGPATH"	# Put template info
 
 # reload vmd
 vmctl reload
 if ! [[ $? -eq 0 ]]
 then
 	echo "Reloading failed."
+	# Restore old config
+	cat $VMCFOLD > /etc/vm.conf
+	cleanup;
 	exit 1
 fi
+
+echo "Starting vm for the first time to finish configuration..."
+# Get vm ip by detecting change in ifconfig
+ifconfig > $IFCFOLD
+vmctl start $VMNAME
+sleep 1
+ifconfig > $IFCFNEW
+sleep 1
+vmctl stop -w $VMNAME > /dev/null
+VMIP=$(diff /tmp/if-old /tmp/if-new | grep inet | awk -F' ' '{print $3}')
+echo $VMIP
+# Save vm info
+#echo "$VMNAME,$TEMPLATENAME,$VMIP" >> "$CONFIGPATH"	# Put template an ip info
+echo "$VMNAME,$TEMPLATENAME" >> "$CONFIGPATH"	# Put template an ip info
+
+# Cleanup
+rm $IFCFOLD $IFCFNEW $VMCFOLD
+
 exit 0

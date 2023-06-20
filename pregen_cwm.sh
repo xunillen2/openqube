@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if [ "$#" -ne 2 ]
+if [ "$#" -ne 1 ]
 then
-	echo "Usage: ./pregen_cwm.sh vm_name vm_ip"
+	echo "Usage: ./pregen_cwm.sh vm_name"
 	exit 1
 fi
 
@@ -20,6 +20,6 @@ VMNAME=${1}
 IP=${2}
 for prog in ${PROGRAMS};
 do
-	./cwm_gen.sh $VMNAME $IP ${prog} ${prog}
+	./cwm_gen.sh $VMNAME ${prog} ${prog}
 done
 
