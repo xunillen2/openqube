@@ -9,7 +9,6 @@ fi
 TEMPLATEPATH=/sandbox/templates
 IMAGESPATH=/sandbox/images
 ISOPATH=/sandbox/iso
-CONFIGPATH=/sandbox/vmconf
 TEMPLATE=${1}
 NEWTEMPLATE=${2}
 TEMPLATEOS="$TEMPLATEPATH"/"$TEMPLATE".qcow2

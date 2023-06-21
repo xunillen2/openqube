@@ -9,32 +9,40 @@ fi
 VMNAME=${1}-vm
 ENTRY=${2}
 COMMAND=${3}
-CONFIGPATH=/sandbox/vmconf
+CONFIGPATH=/sandbox/config
 IMAGESPATH=/sandbox/images
 CWMRC=~/.cwmrc
 VMOS="$VMNAME".qcow2
 VMHOME="$VMNAME"-home.qcow2
 VMOSP="$IMAGESPATH"/"$VMOS"
 VMHOMEP="$IMAGESPATH"/"$VMHOME"
+CONF="$CONFIGPATH"/"$VMNAME".conf
 
-if ! [[ -f "$VMOSP" && -f "$VMHOMEP" ]]
+if ! [[ -f "$VMHOMEP"  && -f "$CONF" ]]
 then
 	echo "VM with that name does not exist"
 	echo "\nAvailable VMs:"
-	echo $(cat $CONFIGPATH | awk -F',' '{print $1}' | awk -F'-' '{print $1}')
+	#echo $(cat $CONFIGPATH | awk -F',' '{print $1}' | awk -F'-' '{print $1}')
+	for vmconf in $CONFIGPATH/*
+	do
+		filename=$(basename $vmconf)
+		echo "\t- ${filename%-vm.conf}"
+	done
 	exit 1
 fi
 
-IP=$(cat $CONFIGPATH | grep "^\\"$VMNAME"," | cut -d',' -f3;)
-TEMP="command $ENTRY-${1}	\"ssh user@$IP -Y $COMMAND\""
+ID=$(vmctl status | grep $VMNAME | awk '{print $1}')
+#IP=$(cat $CONFIGPATH | grep "^\\"$VMNAME"," | cut -d',' -f3;)
+IP=100.64.$ID.3
+TEMP="command $ENTRY-${1}	\"ssh -o StrictHostKeyChecking=no user@$IP -Y $COMMAND\""
 echo $TEMP
-grep "$TEMP" $CWMRC
-if [[ $(grep "$TEMP" $CWMRC) != "" ]]
+grep "user@$IP -Y $COMMAND" $CWMRC
+if [[ $(grep "user@$IP -Y $COMMAND" $CWMRC) != "" ]]
 then
 	echo "Entry exists."
 	exit 1
 fi
 
 cat <<EOF >>"${CWMRC}"
-command $ENTRY-${1}	"ssh user@$IP -Y $COMMAND"
+command $ENTRY-${1}	"ssh -o StrictHostKeyChecking=no user@$IP -Y $COMMAND"
 EOF

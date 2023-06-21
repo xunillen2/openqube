@@ -3,7 +3,7 @@
 TEMPLATEPATH=/sandbox/templates
 IMAGESPATH=/sandbox/images
 ISOPATH=/sandbox/iso
-CONFIGPATH=/sandbox/vmconf
+CONFIGPATH=/sandbox/config
 
 # Set up directories
 
@@ -25,11 +25,11 @@ then
 else
 	mkdir "$ISOPATH"
 fi
-if [[ -f  "$CONFIGPATH" ]]
+if [[ -d  "$CONFIGPATH" ]]
 then
 	echo "$CONFIGPATH exists. Skipping..."
 else
-	touch "$CONFIGPATH"
+	mkdir "$CONFIGPATH"
 fi
 
 # Copy system configuration files
@@ -50,4 +50,5 @@ do
 	tar xvzf "$template" -C "$TEMPLATEPATH"
 	chown root:wheel "$TEMPLATEPATH"/${filename%.tar.gz}.qcow2
 	chown root:wheel "$TEMPLATEPATH"/${filename%.tar.gz}-home.qcow2
+	chown root:wheel "$TEMPLATEPATH"/${filename%.tar.gz}-config.qcow2
 done

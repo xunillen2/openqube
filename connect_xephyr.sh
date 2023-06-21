@@ -1,15 +1,13 @@
 #!/bin/sh
-
-if [ "$#" -ne 1 ]
+if [ "$#" != 1 ]
 then
-	echo "Usage: ./connect.sh vm_name"
+	echo "Usage: ./connect_xephyr.sh vm_name"
 	exit 1
 fi
 
-IMAGESPATH=/sandbox/images
-CONFIGPATH=/sandbox/config
-TEMPLATEPATH=/sandbox/templates
 VMNAME=${1}-vm
+CONFIGPATH=/sandbox/config
+IMAGESPATH=/sandbox/images
 VMOS="$VMNAME".qcow2
 VMHOME="$VMNAME"-home.qcow2
 VMOSP="$IMAGESPATH"/"$VMOS"
@@ -32,14 +30,12 @@ fi
 if ! [[ $(vmctl status | grep $VMNAME | awk '{print $8}') == "running" ]]
 then
 	echo "VM is not running."
-	read input\?"Do you want to start it?[y/n] (needs root): "
-
-	if [[ "$input" != "y" ]]
-	then
-		exit 1
-	fi
-		./start_vm.sh ${1}
-		exit 1
+	exit 1
 fi
-
-xterm -T $VMNAME -bg black -fg white -e "vmctl console $VMNAME" &
+ID=$(vmctl status | grep $VMNAME | awk '{print $1}')
+#IP=$(cat $CONFIGPATH | grep "^\\"$VMNAME"," | cut -d',' -f3;)
+IP=100.64.$ID.3
+echo $IP
+Xephyr -resizeable -screen 800x600 :$ID &
+sleep 1
+DISPLAY=:$ID ssh -o StrictHostKeyChecking=no user@$IP -Y startxfce4 > /dev/null 2>&1 & 

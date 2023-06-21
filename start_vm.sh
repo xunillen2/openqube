@@ -14,24 +14,25 @@ fi
 
 # VM name = vmname-templatename
 IMAGESPATH=/sandbox/images
-CONFIGPATH=/sandbox/vmconf
+CONFIGPATH=/sandbox/config
 TEMPLATEPATH=/sandbox/templates
 VMNAME=${1}-vm
 VMOS="$VMNAME".qcow2
 VMHOME="$VMNAME"-home.qcow2
 VMOSP="$IMAGESPATH"/"$VMOS"
 VMHOMEP="$IMAGESPATH"/"$VMHOME"
-TEMPLATENAME=$(grep "^\\"$VMNAME"," "$CONFIGPATH" | cut -d',' -f2;)
-TEMPLATEOS="$TEMPLATENAME".qcow2
-TEMPLATEHOME="$TEMPLATENAME"-home.qcow2
-TEMPLATEOSP="$TEMPLATEPATH"/"$TEMPLATEOS"
-TEMPLATEHOMEP="$TEMPLATEPATH"/"$TEMPLATEHOME"
+CONF="$CONFIGPATH"/"$VMNAME".conf
 
-if ! [[ TEMPLATENAME != "" &&  -f "$VMOSP" && -f "$VMHOMEP" ]]
+if ! [[ -f "$VMHOMEP"  && -f "$CONF" ]]
 then
 	echo "VM with that name does not exist"
 	echo "\nAvailable VMs:"
-	echo $(cat $CONFIGPATH | awk -F',' '{print $1}' | awk -F'-' '{print $1}')
+	#echo $(cat $CONFIGPATH | awk -F',' '{print $1}' | awk -F'-' '{print $1}')
+	for vmconf in $CONFIGPATH/*
+	do
+		filename=$(basename $vmconf)
+		echo "\t- ${filename%-vm.conf}"
+	done
 	exit 1
 fi
 if [[ $(vmctl status | grep $VMNAME | awk '{print $8}') == "running" ]]
@@ -41,6 +42,7 @@ then
 fi
 
 echo "Starting VM..."
+
 if [[ -f "$VMOSP" ]]
 then
 	rm "$VMOSP"
@@ -52,6 +54,7 @@ then
 fi
 
 # Start and open terminal
+vmctl load $CONF
 vmctl start "$VMNAME" > /dev/null 2>&1
 su xuni -c "xterm -T $VMNAME -bg black -fg white -e \"vmctl console $VMNAME\" &" 
 

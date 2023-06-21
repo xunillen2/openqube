@@ -14,12 +14,11 @@ then
 fi
 
 TEMPLATEPATH=/sandbox/templates
+CONFIGPATH=/sandbox/config
 IMAGESPATH=/sandbox/images
 ISOPATH=/sandbox/iso
-CONFIGPATH=/sandbox/vmconf
 IFCFOLD=/tmp/if-old
 IFCFNEW=/tmp/if-new
-VMCFOLD=/tmp/vm.conf.temp
 VMNAME=${1}-vm
 TEMPLATENAME=${2}
 HOMESIZE=${3}
@@ -32,6 +31,7 @@ VMOS="$VMNAME".qcow2
 VMHOME="$VMNAME"-home.qcow2
 VMOSP="$IMAGESPATH"/"$VMOS"
 VMHOMEP="$IMAGESPATH"/"$VMHOME"
+CONF="$CONFIGPATH"/"$VMNAME".conf
 
 cleanup() {
 	if [[ -f "$VMOSP" ]]
@@ -61,11 +61,20 @@ then
 	echo "$ISOPATH does not exist. Did you run setup.sh?"
 	exit 1
 fi
+if ! [[ -d  "$CONFIGPATH" ]]
+then
+	echo "$CONFIGPATH does not exist. Did you run setup.sh?"
+	exit 1
+fi
 
 # Check if vm with same name exists 
 if [[ -f "$VMOSP" || -f "$VMHOMEP" ]]
 then
 	echo "VM images with same name already exist. Please change vm name."
+	exit 1
+elif [[ -f "$CONF" ]]
+then
+	echo "VM config file for with that VM name already exists. Please change vm name."
 	exit 1
 #else
 	#grep -v "^\\"$VMNAME"," "$CONFIGPATH" > "$CONFIGPATH" # Clear config 
@@ -117,10 +126,11 @@ cp "$TEMPLATEHOMEP" "$VMHOMEP"
 MAC="$(hexdump -n3 -e'/3 "00:60:2F" 3/1 ":%02X"' /dev/random)"
 
 # Backup old config
-cat /etc/vm.conf > $VMCFOLD 
+# cat /etc/vm.conf > $VMCFOLD 
 # Create vm config
 echo "Creating config..."
-cat <<EOF >>/etc/vm.conf
+touch $CONF
+cat <<EOF >>$CONF
 vm "${VMNAME}" {
     disk $VMOSP
     disk $VMHOMEP
@@ -128,16 +138,18 @@ vm "${VMNAME}" {
     local interface locked lladdr $MAC
     memory 1G
     disable
+    #template:$TEMPLATENAME
 }
 EOF
 
 # reload vmd
-vmctl reload
+vmctl load $CONF
 if ! [[ $? -eq 0 ]]
 then
-	echo "Reloading failed."
+	echo "New config load failed."
 	# Restore old config
-	cat $VMCFOLD > /etc/vm.conf
+	#cat $VMCFOLD > /etc/vm.conf
+	rm $CONF
 	cleanup;
 	exit 1
 fi
@@ -154,9 +166,9 @@ VMIP=$(diff /tmp/if-old /tmp/if-new | grep inet | awk -F' ' '{print $3}')
 echo $VMIP
 # Save vm info
 #echo "$VMNAME,$TEMPLATENAME,$VMIP" >> "$CONFIGPATH"	# Put template an ip info
-echo "$VMNAME,$TEMPLATENAME" >> "$CONFIGPATH"	# Put template an ip info
+#echo "$VMNAME,$TEMPLATENAME" >> "$CONFIGPATH"	# Put template an ip info
 
 # Cleanup
-rm $IFCFOLD $IFCFNEW $VMCFOLD
+rm $IFCFOLD $IFCFNEW
 
 exit 0
