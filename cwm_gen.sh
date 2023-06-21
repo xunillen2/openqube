@@ -20,6 +20,8 @@ CONF="$CONFIGPATH"/"$VMNAME".conf
 
 if ! [[ -f "$VMHOMEP"  && -f "$CONF" ]]
 then
+	echo "VM with that name does not exist"
+	echo "\nAvailable VMs:"
 	./list_vms.sh
 	exit 1
 fi

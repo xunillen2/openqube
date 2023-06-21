@@ -28,4 +28,6 @@ then
 	exit 1
 fi
 
-vmctl start -c -L -d $TEMPLATEOS -d $TEMPLATEHOME "$TEMPLATENAME"
+vmctl start -c -L -d $TEMPLATEOS -d $TEMPLATEHOME $TEMPLATENAME
+
+exit 0
