@@ -50,5 +50,5 @@ do
 	tar xvzf "$template" -C "$TEMPLATEPATH"
 	chown root:wheel "$TEMPLATEPATH"/${filename%.tar.gz}.qcow2
 	chown root:wheel "$TEMPLATEPATH"/${filename%.tar.gz}-home.qcow2
-	chown root:wheel "$TEMPLATEPATH"/${filename%.tar.gz}-config.qcow2
+	#chown root:wheel "$TEMPLATEPATH"/${filename%.tar.gz}-config.qcow2
 done

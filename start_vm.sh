@@ -47,6 +47,10 @@ if [[ -f "$VMOSP" ]]
 then
 	rm "$VMOSP"
 fi
+
+TEMPLATE=$(cat $CONF | grep "#template" | cut -d':' -f2)
+TEMPLATEOSP="$TEMPLATEPATH"/$TEMPLATE.qcow2
+
 vmctl create -b "$TEMPLATEOSP" "$VMOSP" > /dev/null 2>&1
 if ! [[ $? -eq 0 ]]
 then
