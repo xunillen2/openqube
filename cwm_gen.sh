@@ -20,14 +20,7 @@ CONF="$CONFIGPATH"/"$VMNAME".conf
 
 if ! [[ -f "$VMHOMEP"  && -f "$CONF" ]]
 then
-	echo "VM with that name does not exist"
-	echo "\nAvailable VMs:"
-	#echo $(cat $CONFIGPATH | awk -F',' '{print $1}' | awk -F'-' '{print $1}')
-	for vmconf in $CONFIGPATH/*
-	do
-		filename=$(basename $vmconf)
-		echo "\t- ${filename%-vm.conf}"
-	done
+	./list_vms.sh
 	exit 1
 fi
 

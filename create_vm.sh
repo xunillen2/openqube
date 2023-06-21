@@ -85,14 +85,7 @@ if ! [[ -f "$TEMPLATEOSP" || -f "$TEMPLATEHOMEP" ]]
 then
 	echo "\nGiven template does not exist."
 	echo "Avilable Templates:"
-	for template in $TEMPLATEPATH/*
-	do
-		filename=$(basename "$template")
-		if [[ $filename != *-home.qcow2 && $filename == *.qcow2 ]]
-		then
-			echo "\t-${filename%.qcow2}"
-		fi
-	done
+	./list_templates.sh
 	exit 1
 fi
 

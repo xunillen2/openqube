@@ -24,7 +24,7 @@ if ! [[ -f "$VMOSP" && -f "$VMHOMEP" ]]
 then
 	echo "VM with that name does not exist"
 	echo "\nAvailable VMs:"
-	echo $(cat $CONFIGPATH | awk -F',' '{print $1}' | awk -F'-' '{print $1}')
+	./list_vms.sh
 	exit 1
 fi
 
