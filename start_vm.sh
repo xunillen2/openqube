@@ -52,6 +52,17 @@ then
 	echo "Error while creating OS image... Cleaning up."
 fi
 
+# Get ID
+ID=$(grep -E '^#id:.*[0-9]$' "$CONF" | cut -d':' -f 2)
+echo $ID
+
+# Check if tap interface exists
+if ! [[ -e /dev/tap$ID ]]
+then
+	echo "Creating new tap interface (there is not one with given id)."
+	(cd /dev; sh MAKEDEV tap$ID)
+fi
+
 # Start and open terminal
 vmctl load $CONF
 vmctl start "$VMNAME" > /dev/null 2>&1

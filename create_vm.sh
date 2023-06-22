@@ -34,6 +34,7 @@ VMHOMEP="$IMAGESPATH"/"$VMHOME"
 CONF="$CONFIGPATH"/"$VMNAME".conf
 
 cleanup() {
+	echo "VM creation failed."
 	if [[ -f "$VMOSP" ]]
 	then
 		rm "$VMOSP"
@@ -118,25 +119,48 @@ cp "$TEMPLATEHOMEP" "$VMHOMEP"
 # generate a MAC address
 MAC="$(hexdump -n3 -e'/3 "00:60:2F" 3/1 ":%02X"' /dev/random)"
 
+# Get new ID
+# TODO: Fix finding unused number as this finds bigest one and 
+# there may be some unused
+ID=0
+for vmconf in $CONFIGPATH/*
+do
+	TEMPID=$(grep -E '^#id:.*[0-9]$' "$vmconf" | cut -d':' -f 2)
+	if [[ $TEMPID > $ID ]]
+	then
+		ID=$TEMPID
+	fi
+done
+ID=$((ID+1))
+echo "ID: $ID"
+
 # Backup old config
 # cat /etc/vm.conf > $VMCFOLD 
 # Create vm config
 echo "Creating config..."
 touch $CONF
 cat <<EOF >>$CONF
+#id:$ID
 vm "${VMNAME}" {
     disk $VMOSP
     disk $VMHOMEP
     owner $OWNERNAME
-    local interface locked lladdr $MAC
+    local interface tap$ID locked lladdr $MAC
     memory 1G
     disable
     #template:$TEMPLATENAME
 }
 EOF
 
+# Check if tap interface exists
+if ! [[ -f /dev/tap$ID ]]
+then
+	echo "Creating new tap interface (there is not one with given id)."
+	(cd /dev; sh MAKEDEV tap$ID)
+fi
+
 # reload vmd
-vmctl load $CONF
+vmctl load $CONF > /dev/null 2>&1
 if ! [[ $? -eq 0 ]]
 then
 	echo "New config load failed."
@@ -154,9 +178,23 @@ vmctl start $VMNAME
 sleep 1
 ifconfig > $IFCFNEW
 sleep 1
+IFIP=$(diff /tmp/if-old /tmp/if-new | grep inet | awk -F' ' '{print $3}')
+VMIP="${IFIP%.2}".3
+echo "VMs IP: $VMIP"
+# Copy ssh key to vm
+#printf "Copying ssh keys"
+#while true;
+#do
+#	ssh -o StrictHostKeyChecking=no user@$VMIP -t "mkdir ~/.ssh"
+#	if [[ $? -eq 0  ]]
+#	then
+#		printf "."
+#		sleep 1
+#	fi
+#done
+#scp -o StrictHostKeyChecking=no ~/.ssh/id_ed25519.pub user@$VMIP:~/.ssh/authorized_keys
+
 vmctl stop -w $VMNAME > /dev/null
-VMIP=$(diff /tmp/if-old /tmp/if-new | grep inet | awk -F' ' '{print $3}')
-echo $VMIP
 # Save vm info
 #echo "$VMNAME,$TEMPLATENAME,$VMIP" >> "$CONFIGPATH"	# Put template an ip info
 #echo "$VMNAME,$TEMPLATENAME" >> "$CONFIGPATH"	# Put template an ip info
