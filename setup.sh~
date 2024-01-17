@@ -107,7 +107,7 @@ else
 	mkdir "$CONFIGPATH"
 fi
 # Set chmod
-chmod 750 $CONFIGPATH
+chmod 740 $CONFIGPATH
 chmod 740 $TEMPLATEPATH
 chmod 740 $IMAGESPATH
 

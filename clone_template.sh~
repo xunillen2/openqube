@@ -37,9 +37,9 @@ then
 	exit 1
 fi
 echo "Cloning template..."
-#vmctl create -b $TEMPLATEOS $NEWTEMPLATEOS # No cause we are not able to change template
-#vmctl create -b $TEMPLATEHOME  $NEWTEMPLATEHOME
-cp $TEMPLATEOS $NEWTEMPLATEOS
-cp $TEMPLATEHOME $NEWTEMPLATEHOME
+vmctl create -b $TEMPLATEOS $NEWTEMPLATEOS
+vmctl create -b $TEMPLATEHOME  $NEWTEMPLATEHOME
+#cp $TEMPLATEOS $NEWTEMPLATEOS
+#cp $TEMPLATEHOME $NEWTEMPLATEHOME
 echo "done"
 exit 1

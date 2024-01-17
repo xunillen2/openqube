@@ -38,7 +38,7 @@ fi
 
 if [[ "$(id -u)" -eq "0" ]]
 then
-	su xuni -c 'xterm -T "$VMNAME" -bg black -fg white -e "vmctl console '"$VMNAME"'" &'
+	su xuni -c 'xterm -T $VMNAME -bg black -fg white -e "vmctl console $VMNAME" &'
 else
 	xterm -T $VMNAME -bg black -fg white -e "vmctl console $VMNAME" &
 fi

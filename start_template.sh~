@@ -12,9 +12,10 @@ then
 	exit 1
 fi
 
-. ./var_setup.sh
-
 # VM name = vmname-templatename
+IMAGESPATH=/sandbox/images
+CONFIGPATH=/sandbox/config
+TEMPLATEPATH=/sandbox/templates
 TEMPLATENAME=${1}
 TEMPLATEOS=$TEMPLATEPATH/"$TEMPLATENAME".qcow2
 TEMPLATEHOME=$TEMPLATEPATH/"$TEMPLATENAME"-home.qcow2

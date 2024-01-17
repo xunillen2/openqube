@@ -6,7 +6,7 @@ then
 	exit 1
 fi
 
-. ./var_setup.sh
+. ./var-setup.sh
 
 VMNAME=${1}-vm
 ENTRY=${2}

@@ -36,7 +36,6 @@ then
 fi
 
 echo "Stoping VM..."
-vmctl stop -f $VMNAME
 
 if [[ -f "$VMOSP" ]]
 then
