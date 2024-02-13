@@ -7,6 +7,10 @@ then
     exit 1
 fi
 
+echo "\nCopyright Xunillen"
+echo "Scripts from this project use code from Solene Rapenne's project Openkubsd."
+echo "Copyright ~solene\n\n"
+
 
 # Ask user where to store stuff
 
@@ -78,7 +82,7 @@ echo "configpath:$CONFIGPATH" >> $SETUPPATH
 echo "templatepath:$TEMPLATEPATH" >> $SETUPPATH
 echo "isopath:$ISOPATH" >> $SETUPPATH
 echo "imagepath:$IMAGESPATH" >> $SETUPPATH
-chmod 640 $SETUPPATH
+chmod 644 $SETUPPATH
 
 # Setup up directories
 
@@ -107,10 +111,9 @@ else
 	mkdir "$CONFIGPATH"
 fi
 # Set chmod
-chmod 750 $CONFIGPATH
-chmod 740 $TEMPLATEPATH
-chmod 740 $IMAGESPATH
-
+chmod 705 $CONFIGPATH
+chmod 700 $TEMPLATEPATH
+chmod 700 $IMAGESPATH
 
 # Unpack and copy templates
 echo "\nUnpacking Templates..."

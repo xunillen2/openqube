@@ -146,7 +146,7 @@ vm "${VMNAME}" {
 }
 EOF
 # set config premissions
-chown 640 $CONF
+chmod 640 $CONF
 
 # Check if tap interface exists
 if ! [[ -f /dev/tap$ID ]]
